@@ -2,3 +2,6 @@ timezone = "Europe/Moscow"
 
 [units_storage]
 base_url = ""
+
+[auth_credentials_storage]
+base_url = ""
