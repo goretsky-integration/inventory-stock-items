@@ -13,11 +13,6 @@ class AuthCredentialsStorageConnection:
     ):
         self.__http_client = http_client
 
-    def get_accounts(self) -> httpx.Response:
-        url = '/accounts/'
-        response = self.__http_client.get(url)
-        return response
-
     def get_cookies(self, account_name: str) -> httpx.Response:
         url = '/auth/cookies/'
         request_query_params = {'account_name': account_name}
