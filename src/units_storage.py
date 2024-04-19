@@ -1,13 +1,13 @@
 import httpx
-from pydantic import HttpUrl, TypeAdapter
+from pydantic import TypeAdapter
 
 from models import Unit
 
 __all__ = ('get_units',)
 
 
-def get_units(*, base_url: HttpUrl) -> list[Unit]:
-    with httpx.Client(base_url=str(base_url)) as http_client:
+def get_units(*, base_url: str) -> list[Unit]:
+    with httpx.Client(base_url=base_url) as http_client:
         response = http_client.get('/units/')
 
     response_data = response.json()
