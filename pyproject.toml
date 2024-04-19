@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "stocks-balance"
+version = "1.0.0"
+description = "Check and detect running out stocks"
+authors = ["Eldos <eldos.baktybekov@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "stocks_balance"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+httpx = "^0.27.0"
+pydantic = "^2.7.0"
+bs4 = "^0.0.2"
+lxml = "^5.2.1"
+faststream = {extras = ["rabbit"], version = "^0.5.2"}
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
