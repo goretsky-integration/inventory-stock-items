@@ -1,4 +1,5 @@
 timezone = "Europe/Moscow"
+country_code = "ru"
 
 [units_storage]
 base_url = ""

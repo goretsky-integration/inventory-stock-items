@@ -3,6 +3,8 @@ import tomllib
 from dataclasses import dataclass
 from zoneinfo import ZoneInfo
 
+from enums import CountryCode
+
 __all__ = ('load_config_from_file', 'Config')
 
 
@@ -11,6 +13,7 @@ class Config:
     timezone: ZoneInfo
     units_storage_base_url: str
     auth_credentials_storage_base_url: str
+    country_code: CountryCode
 
 
 def load_config_from_file(file_path: pathlib.Path) -> Config:
@@ -22,9 +25,11 @@ def load_config_from_file(file_path: pathlib.Path) -> Config:
     auth_credentials_storage_base_url: str = (
         config['auth_credentials_storage']['base_url']
     )
+    country_code = CountryCode[config['country_code'].upper()]
 
     return Config(
         timezone=timezone,
         units_storage_base_url=units_storage_base_url,
         auth_credentials_storage_base_url=auth_credentials_storage_base_url,
+        country_code=country_code,
     )
