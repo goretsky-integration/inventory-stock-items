@@ -11,6 +11,6 @@ class EventPayload(BaseModel):
 
 
 class Event(BaseModel):
-    type: str = Field(default='STOCKS_BALANCE', frozen=True)
-    unit_ids: conlist(list[int], min_length=1)
+    type: str = Field(default='STOPS_AND_RESUMES', frozen=True)
+    unit_ids: conlist(int, min_length=1, max_length=1)
     payload: EventPayload
