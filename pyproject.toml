@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "stocks-balance"
+name = "Inventory stocks items"
 version = "1.0.0"
 description = "Check and detect running out stocks"
 authors = ["Eldos <eldos.baktybekov@gmail.com>"]
