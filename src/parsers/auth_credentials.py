@@ -1,16 +1,10 @@
-import json
-
 import httpx
 
-__all__ = ('parse_accounts_response',)
+from models import AccountCookies
+
+__all__ = ('parse_account_cookies_response',)
 
 
-def parse_accounts_response(response: httpx.Response) -> set[str]:
-    try:
-        response_data: list[dict[str, str]] = response.json()
-    except json.JSONDecodeError:
-        raise  # TODO raise a custom exception here
-    return {
-        account['name'] for account in response_data
-        if account['name'].startswith('office_manager_')
-    }
+def parse_account_cookies_response(response: httpx.Response) -> AccountCookies:
+    response_data: dict[str, str] = response.json()
+    return AccountCookies.model_validate(response_data)
