@@ -14,6 +14,7 @@ class Config:
     units_storage_base_url: str
     auth_credentials_storage_base_url: str
     country_code: CountryCode
+    message_queue_url: str
 
 
 def load_config_from_file(file_path: pathlib.Path) -> Config:
@@ -26,10 +27,12 @@ def load_config_from_file(file_path: pathlib.Path) -> Config:
         config['auth_credentials_storage']['base_url']
     )
     country_code = CountryCode[config['country_code'].upper()]
+    message_queue_url = config['message_queue']['url']
 
     return Config(
         timezone=timezone,
         units_storage_base_url=units_storage_base_url,
         auth_credentials_storage_base_url=auth_credentials_storage_base_url,
         country_code=country_code,
+        message_queue_url=message_queue_url,
     )

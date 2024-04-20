@@ -6,3 +6,6 @@ base_url = ""
 
 [auth_credentials_storage]
 base_url = ""
+
+[message_queue]
+url = "amqp://localhost:5672"
