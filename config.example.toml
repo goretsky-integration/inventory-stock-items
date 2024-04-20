@@ -9,3 +9,9 @@ base_url = ""
 
 [message_queue]
 url = "amqp://localhost:5672"
+
+[sentry]
+is_enabled = false
+dsn = ""
+traces_sample_rate = 1.0
+profiles_sample_rate = 1.0
