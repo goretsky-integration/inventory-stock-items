@@ -4,7 +4,7 @@ from uuid import UUID
 import httpx
 from pydantic import SecretStr
 
-from new_types import DodoISConnectionHttpClient
+from new_types import DodoIsApiConnectionHttpClient
 
 __all__ = ('DodoISConnection',)
 
@@ -15,7 +15,7 @@ def merge_uuids(uuids: Iterable[UUID]) -> str:
 
 class DodoISConnection:
 
-    def __init__(self, http_client: DodoISConnectionHttpClient):
+    def __init__(self, http_client: DodoIsApiConnectionHttpClient):
         self.__http_client = http_client
 
     async def get_inventory_stocks(
