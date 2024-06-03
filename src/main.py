@@ -27,9 +27,6 @@ from units_storage import load_units
 async def main(
         units: list[Unit] = Depends(load_units),
 ) -> None:
-    config_file_path = pathlib.Path(__file__).parent.parent / 'config.toml'
-    config = load_config_from_file(config_file_path)
-
     init_logging()
 
     if config.sentry.is_enabled:

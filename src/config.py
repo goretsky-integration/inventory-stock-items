@@ -10,10 +10,12 @@ __all__ = (
     'Config',
     'SOURCE_DIR',
     'ACCOUNTS_UNITS_FILE_PATH',
+    'CONFIG_FILE_PATH',
 )
 
 SOURCE_DIR = pathlib.Path(__file__).parent
 ACCOUNTS_UNITS_FILE_PATH = SOURCE_DIR.parent / 'accounts_units.json'
+CONFIG_FILE_PATH = SOURCE_DIR.parent / 'config.toml'
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,7 +35,7 @@ class Config:
     sentry: SentryConfig
 
 
-def load_config_from_file(file_path: pathlib.Path) -> Config:
+def load_config_from_file(file_path: pathlib.Path = CONFIG_FILE_PATH) -> Config:
     config_text = file_path.read_text(encoding='utf-8')
     config = tomllib.loads(config_text)
 
