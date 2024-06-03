@@ -8,7 +8,7 @@ __all__ = (
 )
 
 AuthCredentialsStorageConnectionHttpClient = (
-    NewType('AuthCredentialsStorageConnectionHttpClient', httpx.Client)
+    NewType('AuthCredentialsStorageConnectionHttpClient', httpx.AsyncClient)
 )
 DodoIsApiConnectionHttpClient = NewType(
     'DodoIsApiConnectionHttpClient',
