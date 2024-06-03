@@ -3,6 +3,7 @@ import itertools
 import pathlib
 
 import sentry_sdk
+from fast_depends import Depends, inject
 from toolz import groupby
 
 from auth_credentials_storage import AuthCredentialsStorageConnection
@@ -15,15 +16,17 @@ from http_clients import (
 )
 from logger import init_logging
 from message_queue import publish_events
-from models import Event, EventPayload, InventoryStockItem
+from models import Event, EventPayload, InventoryStockItem, Unit
 from parsers import (
     parse_account_cookies_response,
-    parse_inventory_stocks_response,
 )
-from units_storage import get_units
+from units_storage import load_units
 
 
-async def main() -> None:
+@inject
+async def main(
+        units: list[Unit] = Depends(load_units),
+) -> None:
     config_file_path = pathlib.Path(__file__).parent.parent / 'config.toml'
     config = load_config_from_file(config_file_path)
 
@@ -35,8 +38,6 @@ async def main() -> None:
             traces_sample_rate=config.sentry.traces_sample_rate,
             profiles_sample_rate=config.sentry.profiles_sample_rate,
         )
-
-    units = get_units(base_url=config.units_storage_base_url)
 
     account_name_to_units = (
         itertools.groupby(

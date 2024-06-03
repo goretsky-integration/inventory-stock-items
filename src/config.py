@@ -5,7 +5,15 @@ from zoneinfo import ZoneInfo
 
 from enums import CountryCode
 
-__all__ = ('load_config_from_file', 'Config')
+__all__ = (
+    'load_config_from_file',
+    'Config',
+    'SOURCE_DIR',
+    'ACCOUNTS_UNITS_FILE_PATH',
+)
+
+SOURCE_DIR = pathlib.Path(__file__).parent
+ACCOUNTS_UNITS_FILE_PATH = SOURCE_DIR.parent / 'accounts_units.json'
 
 
 @dataclass(frozen=True, slots=True)
@@ -19,7 +27,6 @@ class SentryConfig:
 @dataclass(frozen=True, slots=True)
 class Config:
     timezone: ZoneInfo
-    units_storage_base_url: str
     auth_credentials_storage_base_url: str
     country_code: CountryCode
     message_queue_url: str
@@ -31,7 +38,6 @@ def load_config_from_file(file_path: pathlib.Path) -> Config:
     config = tomllib.loads(config_text)
 
     timezone = ZoneInfo(config['timezone'])
-    units_storage_base_url: str = config['units_storage']['base_url']
     auth_credentials_storage_base_url: str = (
         config['auth_credentials_storage']['base_url']
     )
@@ -48,7 +54,6 @@ def load_config_from_file(file_path: pathlib.Path) -> Config:
 
     return Config(
         timezone=timezone,
-        units_storage_base_url=units_storage_base_url,
         auth_credentials_storage_base_url=auth_credentials_storage_base_url,
         country_code=country_code,
         message_queue_url=message_queue_url,
