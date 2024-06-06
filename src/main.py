@@ -1,30 +1,25 @@
 import asyncio
-import itertools
-import operator
 
 import sentry_sdk
-import toolz
 from fast_depends import Depends, inject
-from toolz import groupby
 
 from config import Config, load_config_from_file
 from connections.auth_credentials import AuthCredentialsStorageConnection
+from connections.dodo_is_api import DodoISConnection
 from context.auth_credentials import AuthCredentialsFetchUnitOfWork
 from context.dodo_is_api import InventoryStocksFetchUnitOfWork
-from dependencies.auth_credentials import \
-    get_auth_credentials_storage_connection
+from dependencies.auth_credentials import (
+    get_auth_credentials_storage_connection,
+)
 from dependencies.dodo_is_api import get_dodo_is_api_connection
-from dodo_is import DodoISConnection
 from filters import filter_running_out_stock_items
-from http_clients import (
-    closing_dodo_is_connection_http_client,
+from mappers import (
+    AccountsUnitsMapper,
+    UnitsMapper,
+    map_inventory_stocks_to_events,
 )
-from logger import init_logging
 from message_queue import publish_events
-from models import AccountUnits, Event, EventPayload, InventoryStockItem, Unit
-from parsers import (
-    parse_account_tokens_response,
-)
+from models import AccountUnits
 from units_storage import load_units
 
 
@@ -39,7 +34,7 @@ async def main(
             get_dodo_is_api_connection,
         )
 ) -> None:
-    init_logging()
+    accounts_units_mapper = AccountsUnitsMapper(accounts_units)
 
     if config.sentry.is_enabled:
         sentry_sdk.init(
@@ -48,21 +43,10 @@ async def main(
             profiles_sample_rate=config.sentry.profiles_sample_rate,
         )
 
-    # account_name_to_units = (
-    #     itertools.groupby(
-    #         iterable=units,
-    #         key=lambda unit: unit.office_manager_account_name,
-    #     )
-    # )
-
-    account_names = {
-        account_units.account_name for account_units in accounts_units
-    }
-
     auth_credentials_fetch_unit_of_work = AuthCredentialsFetchUnitOfWork(
         connection=auth_credentials_storage_connection,
     )
-    for account_name in account_names:
+    for account_name in accounts_units_mapper.account_names:
         auth_credentials_fetch_unit_of_work.register_task(account_name)
 
     account_tokens = await auth_credentials_fetch_unit_of_work.commit()
@@ -74,12 +58,12 @@ async def main(
     inventory_stocks_fetch_unit_of_work = InventoryStocksFetchUnitOfWork(
         connection=dodo_is_api_connection,
     )
-    for account_units in accounts_units:
-        unit_uuids = [unit.uuid for unit in account_units.units]
+    for account_units in accounts_units_mapper.accounts_units:
+        units_mapper = UnitsMapper(account_units.units)
         access_token = account_name_to_access_token[account_units.account_name]
         inventory_stocks_fetch_unit_of_work.register_task(
             access_token=access_token,
-            unit_uuids=unit_uuids,
+            unit_uuids=units_mapper.uuids,
         )
 
     inventory_stocks = await inventory_stocks_fetch_unit_of_work.commit()
@@ -88,29 +72,11 @@ async def main(
         items=inventory_stocks,
         threshold=1,
     )
-    unit_uuid_to_inventory_stocks: dict[int, list[InventoryStockItem]] = groupby(
-        operator.attrgetter('unit_uuid'),
-        inventory_stocks,
+    events = map_inventory_stocks_to_events(
+        inventory_stocks=inventory_stocks,
+        units=accounts_units_mapper.units,
     )
-
-    units = [
-        unit
-        for account_units in accounts_units
-        for unit in account_units.units
-    ]
-
-    events: list[Event] = []
-    for unit in units:
-        items = unit_uuid_to_inventory_stocks.get(unit.uuid, [])
-
-        event = Event(
-            unit_ids=[unit.id],
-            payload=EventPayload(
-                unit_name=unit.name,
-                inventory_stock_items=items,
-            ),
-        )
-        events.append(event)
+    print(events)
 
     await publish_events(
         message_queue_url=config.message_queue_url,

@@ -3,16 +3,13 @@ from collections.abc import Iterable
 from typing import Final, TypeAlias, TypeVar
 from uuid import UUID
 
-import structlog.stdlib
 from pydantic import SecretStr
 
-from dodo_is import DodoISConnection
+from connections.dodo_is_api import DodoISConnection
 from models import InventoryStockItem
 from parsers.dodo_is_api import parse_inventory_stocks_response
 
 __all__ = ('InventoryStocksFetchUnitOfWork',)
-
-logger = structlog.stdlib.get_logger('dodo_is_api')
 
 T = TypeVar('T')
 
