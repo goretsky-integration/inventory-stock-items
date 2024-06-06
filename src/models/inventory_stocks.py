@@ -11,7 +11,7 @@ __all__ = ('InventoryStockItem',)
 
 class InventoryStockItem(BaseModel):
     name: str
-    unit_id: Annotated[UUID, Field(validation_alias='unitId')]
+    unit_uuid: Annotated[UUID, Field(validation_alias='unitId')]
     quantity: float
     measurement_unit: Annotated[
         MeasurementUnit,

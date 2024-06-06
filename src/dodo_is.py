@@ -3,10 +3,15 @@ from uuid import UUID
 
 import httpx
 from pydantic import SecretStr
+from structlog.contextvars import bound_contextvars
 
 from new_types import DodoIsApiConnectionHttpClient
 
+import structlog.stdlib
+
 __all__ = ('DodoISConnection',)
+
+logger = structlog.stdlib.get_logger('dodo_is_api')
 
 
 def merge_uuids(uuids: Iterable[UUID]) -> str:
@@ -35,8 +40,15 @@ class DodoISConnection:
         headers = {
             'Authorization': f'Bearer {access_token.get_secret_value()}',
         }
-        return await self.__http_client.get(
-            url=url,
-            params=request_query_params,
-            headers=headers,
-        )
+        with bound_contextvars(params=request_query_params):
+            response = await self.__http_client.get(
+                url=url,
+                params=request_query_params,
+                headers=headers,
+            )
+            logger.debug(
+                'Retrieved inventory stocks from Dodo IS API',
+                status_code=response.status_code,
+            )
+
+        return response
