@@ -11,6 +11,7 @@ __all__ = (
     'SOURCE_DIR',
     'ACCOUNTS_UNITS_FILE_PATH',
     'CONFIG_FILE_PATH',
+    'LoggingConfig',
 )
 
 SOURCE_DIR = pathlib.Path(__file__).parent
@@ -27,12 +28,18 @@ class SentryConfig:
 
 
 @dataclass(frozen=True, slots=True)
+class LoggingConfig:
+    level: str
+
+
+@dataclass(frozen=True, slots=True)
 class Config:
     timezone: ZoneInfo
     auth_credentials_storage_base_url: str
     country_code: CountryCode
     message_queue_url: str
     sentry: SentryConfig
+    logging: LoggingConfig
 
 
 def load_config_from_file(file_path: pathlib.Path = CONFIG_FILE_PATH) -> Config:
@@ -54,10 +61,16 @@ def load_config_from_file(file_path: pathlib.Path = CONFIG_FILE_PATH) -> Config:
         profiles_sample_rate=sentry_config['profiles_sample_rate'],
     )
 
+    logging_config = config['logging']
+    logging = LoggingConfig(
+        level=logging_config['level'].upper(),
+    )
+
     return Config(
         timezone=timezone,
         auth_credentials_storage_base_url=auth_credentials_storage_base_url,
         country_code=country_code,
         message_queue_url=message_queue_url,
         sentry=sentry,
+        logging=logging,
     )
