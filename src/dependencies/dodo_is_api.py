@@ -2,7 +2,7 @@ import httpx
 from fast_depends import Depends
 
 from config import Config, load_config_from_file
-from dodo_is import DodoISConnection
+from connections.dodo_is_api import DodoISConnection
 from new_types import DodoIsApiConnectionHttpClient
 
 __all__ = (
