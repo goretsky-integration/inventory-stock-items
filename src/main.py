@@ -75,12 +75,11 @@ async def main(
         inventory_stocks_result=inventory_stocks_result,
         units=accounts_units_mapper.units,
     )
-    print(events)
 
-    # await publish_events(
-    #     message_queue_url=config.message_queue_url,
-    #     events=events,
-    # )
+    await publish_events(
+        message_queue_url=config.message_queue_url,
+        events=events,
+    )
 
 
 if __name__ == '__main__':
