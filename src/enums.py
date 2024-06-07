@@ -1,6 +1,6 @@
 from enum import StrEnum, auto
 
-__all__ = ('CountryCode', 'MeasurementUnit')
+__all__ = ('CountryCode', 'MeasurementUnit', 'CategoryName')
 
 
 class CountryCode(StrEnum):
@@ -12,3 +12,12 @@ class MeasurementUnit(StrEnum):
     KILOGRAM = 'Kilogram'
     LITER = 'Liter'
     METER = 'Meter'
+
+
+class CategoryName(StrEnum):
+    INGREDIENT = 'Ingredient'
+    SEMI_FINISHED_PRODUCT = 'SemiFinishedProduct'
+    FINISHED_PRODUCT = 'FinishedProduct'
+    INVENTORY = 'Inventory'
+    PACKING = 'Packing'
+    CONSUMABLES = 'Consumables'

@@ -5,8 +5,13 @@ from typing import TypeVar
 from uuid import UUID
 
 from context.dodo_is_api import InventoryStocksFetchAllResult
-from filters import filter_running_out_stock_items
-from models import AccountUnits, Event, EventPayload, InventoryStockItem, Unit
+from enums import CategoryName
+from filters import (
+    filter_by_category_names,
+    filter_relevant_items,
+    filter_running_out_stock_items,
+)
+from models import AccountUnits, Event, EventPayload, Unit
 
 __all__ = (
     'group_by_unit_uuid',
@@ -29,9 +34,24 @@ def map_inventory_stocks_to_events(
         inventory_stocks_result: InventoryStocksFetchAllResult,
         units: Iterable[Unit],
 ) -> list[Event]:
-    inventory_stocks = filter_running_out_stock_items(
+    inventory_stocks = filter_relevant_items(
         items=inventory_stocks_result.stocks,
+    )
+
+    inventory_stocks = filter_running_out_stock_items(
+        items=inventory_stocks,
         threshold=1,
+    )
+
+    allowed_category_names = [
+        CategoryName.INVENTORY,
+        CategoryName.PACKING,
+        CategoryName.FINISHED_PRODUCT,
+        CategoryName.SEMI_FINISHED_PRODUCT,
+    ]
+    inventory_stocks = filter_by_category_names(
+        items=inventory_stocks,
+        category_names=allowed_category_names,
     )
 
     unit_uuid_to_inventory_stocks = group_by_unit_uuid(inventory_stocks)
