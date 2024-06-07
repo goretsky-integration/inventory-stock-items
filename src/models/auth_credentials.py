@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
-__all__ = ('AccountCookies',)
+__all__ = ('AccountTokens',)
 
 
-class AccountCookies(BaseModel):
+class AccountTokens(BaseModel):
     account_name: str
-    cookies: dict[str, str]
+    access_token: SecretStr

@@ -4,10 +4,13 @@ import httpx
 
 __all__ = (
     'AuthCredentialsStorageConnectionHttpClient',
-    'DodoISConnectionHttpClient',
+    'DodoIsApiConnectionHttpClient',
 )
 
 AuthCredentialsStorageConnectionHttpClient = (
-    NewType('AuthCredentialsStorageConnectionHttpClient', httpx.Client)
+    NewType('AuthCredentialsStorageConnectionHttpClient', httpx.AsyncClient)
 )
-DodoISConnectionHttpClient = NewType('DodoISConnectionHttpClient', httpx.Client)
+DodoIsApiConnectionHttpClient = NewType(
+    'DodoIsApiConnectionHttpClient',
+    httpx.AsyncClient,
+)

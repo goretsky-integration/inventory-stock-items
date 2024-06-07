@@ -1,15 +1,16 @@
-import httpx
+import pathlib
+
 from pydantic import TypeAdapter
 
-from models import Unit
+import config
+from models import AccountUnits
 
-__all__ = ('get_units',)
+__all__ = ('load_units',)
 
 
-def get_units(*, base_url: str) -> list[Unit]:
-    with httpx.Client(base_url=base_url) as http_client:
-        response = http_client.get('/units/')
-
-    response_data = response.json()
-    type_adapter = TypeAdapter(list[Unit])
-    return type_adapter.validate_python(response_data['units'])
+def load_units(
+        file_path: pathlib.Path = config.ACCOUNTS_UNITS_FILE_PATH,
+) -> list[AccountUnits]:
+    type_adapter = TypeAdapter(list[AccountUnits])
+    config_json = file_path.read_text(encoding='utf-8')
+    return type_adapter.validate_json(config_json)

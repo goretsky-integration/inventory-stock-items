@@ -161,3 +161,4 @@ cython_debug/
 
 # Config
 config.toml
+logging_config.json
