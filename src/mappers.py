@@ -4,6 +4,8 @@ from functools import cached_property
 from typing import TypeVar
 from uuid import UUID
 
+from context.dodo_is_api import InventoryStocksFetchAllResult
+from filters import filter_running_out_stock_items
 from models import AccountUnits, Event, EventPayload, InventoryStockItem, Unit
 
 __all__ = (
@@ -24,13 +26,22 @@ def group_by_unit_uuid(items: Iterable[T]) -> dict[UUID, list[T]]:
 
 
 def map_inventory_stocks_to_events(
-        inventory_stocks: Iterable[InventoryStockItem],
+        inventory_stocks_result: InventoryStocksFetchAllResult,
         units: Iterable[Unit],
 ) -> list[Event]:
+    inventory_stocks = filter_running_out_stock_items(
+        items=inventory_stocks_result.stocks,
+        threshold=1,
+    )
+
     unit_uuid_to_inventory_stocks = group_by_unit_uuid(inventory_stocks)
 
     events: list[Event] = []
     for unit in units:
+
+        if unit.uuid in inventory_stocks_result.error_unit_uuids:
+            continue
+
         items = unit_uuid_to_inventory_stocks.get(unit.uuid, [])
 
         event = Event(

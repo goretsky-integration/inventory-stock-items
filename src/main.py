@@ -11,6 +11,7 @@ from context.dodo_is_api import InventoryStocksFetchUnitOfWork
 from dependencies.auth_credentials import (
     get_auth_credentials_storage_connection,
 )
+from logger import setup_logging
 from dependencies.dodo_is_api import get_dodo_is_api_connection
 from filters import filter_running_out_stock_items
 from mappers import (
@@ -34,6 +35,8 @@ async def main(
             get_dodo_is_api_connection,
         )
 ) -> None:
+    setup_logging()
+
     accounts_units_mapper = AccountsUnitsMapper(accounts_units)
 
     if config.sentry.is_enabled:
@@ -66,22 +69,18 @@ async def main(
             unit_uuids=units_mapper.uuids,
         )
 
-    inventory_stocks = await inventory_stocks_fetch_unit_of_work.commit()
+    inventory_stocks_result = await inventory_stocks_fetch_unit_of_work.commit()
 
-    inventory_stocks = filter_running_out_stock_items(
-        items=inventory_stocks,
-        threshold=1,
-    )
     events = map_inventory_stocks_to_events(
-        inventory_stocks=inventory_stocks,
+        inventory_stocks_result=inventory_stocks_result,
         units=accounts_units_mapper.units,
     )
     print(events)
 
-    await publish_events(
-        message_queue_url=config.message_queue_url,
-        events=events,
-    )
+    # await publish_events(
+    #     message_queue_url=config.message_queue_url,
+    #     events=events,
+    # )
 
 
 if __name__ == '__main__':
