@@ -25,4 +25,16 @@ class InventoryStockItem(BaseModel):
         int,
         Field(validation_alias='daysUntilBalanceRunsOut'),
     ]
+    balance_in_money: Annotated[
+        float,
+        Field(validation_alias='balanceInMoney'),
+    ]
+    average_weekday_expense: Annotated[
+        float,
+        Field(validation_alias='avgWeekdayExpense'),
+    ]
+    average_weekend_expense: Annotated[
+        float,
+        Field(validation_alias='avgWeekendExpense'),
+    ]
     calculated_at: Annotated[datetime, Field(validation_alias='calculatedAt')]
