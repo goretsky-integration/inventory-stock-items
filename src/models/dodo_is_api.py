@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from models.inventory_stocks import InventoryStockItem
 
@@ -13,3 +13,5 @@ class InventoryStocksResponseBody(BaseModel):
         bool,
         Field(validation_alias='isEndOfListReached'),
     ]
+
+    model_config = ConfigDict(populate_by_name=True)

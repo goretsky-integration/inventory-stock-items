@@ -1,4 +1,5 @@
 import asyncio
+import sys
 
 import sentry_sdk
 from fast_depends import Depends, inject
@@ -11,9 +12,8 @@ from context.dodo_is_api import InventoryStocksFetchUnitOfWork
 from dependencies.auth_credentials import (
     get_auth_credentials_storage_connection,
 )
-from logger import setup_logging
 from dependencies.dodo_is_api import get_dodo_is_api_connection
-from filters import filter_running_out_stock_items
+from logger import setup_logging
 from mappers import (
     AccountsUnitsMapper,
     UnitsMapper,
