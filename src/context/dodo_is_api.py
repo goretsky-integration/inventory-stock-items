@@ -1,4 +1,5 @@
 import asyncio
+import itertools
 from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Final, TypeAlias, TypeVar
