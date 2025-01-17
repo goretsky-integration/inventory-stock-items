@@ -20,6 +20,15 @@ T = TypeVar('T')
 AccessTokenAndUnitUuids: TypeAlias = tuple[SecretStr, Iterable[UUID]]
 
 
+def batched(iterable: Iterable[T], n: int) -> Iterable[list[T]]:
+    iterator = iter(iterable)
+    while True:
+        batch = list(itertools.islice(iterator, n))
+        if not batch:
+            return
+        yield batch
+
+
 @dataclass(frozen=True, slots=True)
 class InventoryStocksFetchResult:
     unit_uuids: list[UUID]
@@ -104,11 +113,12 @@ class InventoryStocksFetchUnitOfWork:
         tasks: list[asyncio.Task[InventoryStocksFetchResult]] = []
         async with asyncio.TaskGroup() as task_group:
             for access_token, unit_uuids in self.__tasks:
-                task = self._get_units_all_inventory_stocks(
-                    access_token=access_token,
-                    unit_uuids=unit_uuids,
-                )
-                tasks.append(task_group.create_task(task))
+                for unit_uuids_batch in batched(unit_uuids, n=30):
+                    task = self._get_units_all_inventory_stocks(
+                        access_token=access_token,
+                        unit_uuids=unit_uuids_batch,
+                    )
+                    tasks.append(task_group.create_task(task))
 
         stocks: list[InventoryStockItem] = []
         error_unit_uuids: set[UUID] = set()
